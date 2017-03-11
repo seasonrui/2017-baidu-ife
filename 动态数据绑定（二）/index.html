@@ -58,8 +58,7 @@ Event.prototype.on = function (attr, callback) {
   }
 }
 Event.prototype.emit = function (attr, newval) {
-  console.log('触发了' + attr); //深层对象属性会触发，例如修改lastName时会输出：'触发了lastName'
-  console.log(attr + '的回调函数是：' + this.events[attr]); // 深层对象属性回调是undefined，例如修改lastName是输出:'lastName的回调函数是：undefined',但是遍历this.events又有lastName属性以及对应的回调函数，为什么呢？？
+  console.log(this.events); // 每一层的event都是不一样的，深层对象属性触发的时候可以看出this.events里为空。
   for(var item in this.events) {
     if(item === attr) {
       this.events[attr].forEach(function(item) {
