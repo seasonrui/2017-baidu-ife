@@ -8,26 +8,26 @@
 <script type="text/javascript">
 function Observer(data) {
   this.data = data;
-  this.reDefine(data);
+  this.setAndget(data);
 }
 
-Observer.prototype.reDefine = function(data) {
-  let arr = Object.keys(data);
-  arr.forEach((value,index) => {
-    var val = data[value];
-    Object.defineProperty(data, value, {
-      configurable: true,
-      enumerable: true,
-      get: function () {
-        console.log('你访问了' + value);
-        return val;
-      },
-      set: function (newval) {
-        console.log('你设置了' + val + ',新的值为' + newval);
-        val = newval;
-      }
-    })
-  })
+Observer.prototype.makeObserver = function(data) {
+  for(var key in data) {
+    if(data.hasOwnProperty(key)) {
+      Object.defineProperty(data, key, {
+        configurable: true,
+        enumerable: true,
+        get: function () {
+          console.log('你访问了' + key);
+          return val;
+        },
+        set: function (newval) {
+          console.log('你设置了' + val + ',新的值为' + newval);
+          val = newval;
+        }
+      })
+    }
+  }
 }
 
 let app1 = new Observer({

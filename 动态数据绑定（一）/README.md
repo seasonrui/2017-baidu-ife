@@ -1,4 +1,67 @@
-## 动态数据绑定（一） 
+## 动态数据绑定（一）
+笔记 
+题目需要监听属性的变化，有两种方式：
+1.**采用ES5中的defineProperty，设置get和set函数，重新定义读取和赋值的方式**。
+2.**采用ES6中的proxy，对目标对象进行"拦截"**。
+方式一：
+Object.defineProperty可设置的属性如下：
+**configurable**：能否使用delete、能否需改属性特性、能否修改访问器属性，false为不可重新定义，默认值为true。一般情况下，configurable是设置为true，如果设置为false，这个属性除了writable之外都不能修改了，writable也只能从true改为false而不能反过来。
+**enumerable**：对象属性是否可通过for-in循环，flase为不可循环，默认值为true
+**writable**：对象属性是否可修改,flase为不可修改，默认值为true
+**value**：对象属性的默认值，默认值为undefined。
+接着获取对象属性：
+方法一：使用Object.keys(obj)，该方法返回一个数组，数组里是obj可被枚举的所有属性，接着对数组进行forEach遍历。
+方法二：使用for in获取所有属性，接着用obj.hasOwnProperty(key)对属性进行判断过滤。
+接着就可以自定义get和set函数啦！
+在这过程中犯了一个低级错误：
+get函数return data[key]，导致get函数返回值时又触发了get函数，陷入死循环。
+最终代码：
+
+    function Observer(data) {
+      this.data = data;
+      this.setAndget(data);
+    }
+    Observer.prototype.makeObserver = function(data) {
+      for(var key in data) {
+        if(data.hasOwnProperty(key)) {
+          Object.defineProperty(data, key, {
+            configurable: true,
+            enumerable: true,
+            get: function () {
+              console.log('你访问了' + key);
+              return val;
+            },
+            set: function (newval) {
+              console.log('你设置了' + val + ',新的值为' + newval);
+              val = newval;
+            }
+          })
+        }
+      }
+    }
+
+方式二：
+> Proxy可以理解成，在目标对象之前架设一层“拦截”，外界对该对象的访问，都必须先通过这层拦截，因此提供了一种机制，可以对外界的访问进行过滤和改写。Proxy这个词的原意是代理，用在这里表示由它来“代理”某些操作，可以译为“代理器”。
+
+最终代码：
+
+    function Observer (data) {
+      return new Proxy(data, {
+        get: function (target, propKey) {
+          if (propKey in target) {
+            console.log('你访问了' + propKey);
+            return target[propKey];
+          } else {
+            console.log("Property \"" + propKey + "\" does not exist.");
+          }
+        },
+        set: function (target, propKey, value) {
+          console.log('你设置了' + propKey + ',新的值为' + value);
+          target[propKey] = value;
+        }
+      })
+    }
+
 
 任务目的
 --
