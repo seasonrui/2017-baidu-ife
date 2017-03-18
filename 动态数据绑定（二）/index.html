@@ -8,18 +8,17 @@
 <script type="text/javascript">
 function Observer(data) {
   this.data = data;
-  this.reDefine(data);
+  this.makeObserver(data);
   this.eventsBus = new Event();
 }
 
-Observer.prototype.reDefine = function(data) {
+Observer.prototype.makeObserver = function(data) {
   for(var i in data) {
     if(data.hasOwnProperty(i)) {
       if(typeof data[i] === 'object') {
         new Observer(data[i]);
-      } else {
-        this.getset(i, data[i]);
       }
+      this.getset(i, data[i]);
     }
   }
 }
@@ -35,10 +34,10 @@ Observer.prototype.getset = function(i, value) {
       return val;
     },
     set: function (newval) {
-      if(typeof newval === 'object') {
-        new Observer(val);
-      }
       console.log('你设置了' + i + ',新的值为' + newval);
+      if(typeof newval === 'object') {
+        new Observer(newval);
+      }
       // 触发
       that.eventsBus.emit(i, newval);
       val = newval;
@@ -78,7 +77,7 @@ let app1 = new Observer({
   name: {
     firstName: 'rui',
     lastName: 'sun'
-  } 
+  }
 })
 app1.$watch('age', function(age) {
   console.log(`我的年纪变了，现在已经是：${age}岁了`)
