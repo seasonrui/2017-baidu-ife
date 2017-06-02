@@ -1,4 +1,4 @@
-## 动态数据绑定（一）
+﻿## 动态数据绑定（一）
 
 笔记 
 --
@@ -12,7 +12,7 @@
 
 Object.defineProperty可设置的属性如下：
 
-**configurable**：能否使用delete、能否需改属性特性、能否修改访问器属性，false为不可重新定义，默认值为true。一般情况下，configurable是设置为true，如果设置为false，这个属性除了writable之外都不能修改了，writable也只能从true改为false而不能反过来。
+**configurable**：能否使用delete、能否修改属性特性、能否修改访问器属性，false为不可重新定义，默认值为true。一般情况下，configurable是设置为true，如果设置为false，这个属性除了writable之外都不能修改了，writable也只能从true改为false而不能反过来。
 
 **enumerable**：对象属性是否可通过for-in循环，flase为不可循环，默认值为true。
 
@@ -29,29 +29,30 @@ Object.defineProperty可设置的属性如下：
 接着就可以自定义get和set函数啦！
 
 在这过程中犯了一个低级错误：
-get函数return data[key]，导致get函数返回值时又触发了get函数，陷入死循环。
+get函数return data[key]，导致get函数返回时又触发了get函数，陷入死循环。
 
 最终代码：
 
     function Observer(data) {
       this.data = data;
-      this.setAndget(data);
+      this.makeObserver(data);
     }
     Observer.prototype.makeObserver = function(data) {
       for(var key in data) {
         if(data.hasOwnProperty(key)) {
-          Object.defineProperty(data, key, {
-            configurable: true,
-            enumerable: true,
-            get: function () {
-              console.log('你访问了' + key);
-              return val;
-            },
-            set: function (newval) {
-              console.log('你设置了' + val + ',新的值为' + newval);
-              val = newval;
-            }
-          })
+            var val = data[key];
+            Object.defineProperty(data, key, {
+                configurable: true,
+                enumerable: true,
+                get: function () {
+                    console.log('你访问了' + key);
+                    return val;
+                },
+                set: function (newval) {
+                    console.log('你设置了' + val + ',新的值为' + newval);
+                    val = newval;
+                }
+            })
         }
       }
     }
