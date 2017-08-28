@@ -1,4 +1,4 @@
-## 动态数据绑定（一）
+﻿## 动态数据绑定（一）
 
 笔记 
 --
@@ -50,7 +50,7 @@ console.log(Object.getOwnPropertyDescriptor(obj, 'name'))
 接着就可以自定义get和set函数啦！
 
 在这过程中犯了一个低级错误：
-get函数return data[key]，导致get函数返回值时又触发了get函数，陷入死循环。
+get函数return data[key]，导致get函数返回时又触发了get函数，陷入死循环。
 
 最终代码：
 
