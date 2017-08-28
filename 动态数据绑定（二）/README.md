@@ -5,16 +5,15 @@
 
 > 如果传入参数对象是一个“比较深”的对象（也就是其属性值也可能是对象），那该怎么办呢？
 
-即如果传入对又是一个对象呢？需要将“深对象”也绑定get、set方法，想到用递归的方法，对属性进行判断，如果是对象，则重新new一个Observer出来。即：
+即如果传入对又是一个对象呢？需要将“深对象”也绑定get、set方法，想到用递归的方法，对属性进行判断，如果属性值是对象，则重新new一个Observer出来。即：
 
     Observer.prototype.makeObserver = function(data) {
       for(var i in data) {
         if(data.hasOwnProperty(i)) {
           if(typeof data[i] === 'object') {
             new Observer(data[i]);
-          } else {
-            this.getset(i, data[i]);
           }
+          this.getset(i, data[i]);
         }
       }
     }

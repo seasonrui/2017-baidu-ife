@@ -11,11 +11,11 @@
 function Observer(data, path, $parent) {
   this.data = data;
   this.$parent = (typeof $parent === 'undefined') ? null : $parent;
-  this.walk(data, path, $parent);// 传递父元素
+  this.makeObserver(data, path, $parent);
   this.eventsBus = new Event();
 }
 
-Observer.prototype.walk = function(data, path, $parent) {
+Observer.prototype.makeObserver = function(data, path, $parent) {
   var self = this;
   for (var i in data) {
     if (data.hasOwnProperty(i)) {
@@ -23,14 +23,14 @@ Observer.prototype.walk = function(data, path, $parent) {
       if (typeof data[i] === 'object') {
         new Observer(data[i], new_path, self);
       } else {
-        this.convert(i, data[i], new_path);
+        this.getset(i, data[i], new_path);
       }
     }
   }
 }
 
 
-Observer.prototype.convert = function (i, value, path) {
+Observer.prototype.getset = function (i, value, path) {
   let val = value;
   let self = this;
   Object.defineProperty(this.data, i, {
@@ -41,7 +41,7 @@ Observer.prototype.convert = function (i, value, path) {
       return val;
     },
     set: function (newval) {
-      self.bubble(self, path, val, newval);
+      self.bubble(self, path, val, newval); // 事件冒泡
       if(typeof newval === 'object') {
         new Observer(val);
       }
@@ -56,9 +56,9 @@ Observer.prototype.bubble = function (self, path, val, newval) {
   if (self === null) 
     return;
   var params = Array.prototype.slice.call(arguments, 1);
-  self.eventsBus.emit.apply(self.eventsBus, params);
+  self.eventsBus.emit(params[0], params[1], params[2]);
   var parent_path = path.split('.').slice(0, -1).join('.');
-  self.bubble(self.$parent, parent_path, val, newval);
+  self.bubble(self.$parent, parent_path, val, newval);  //关键点
 }
 
 function Event() {

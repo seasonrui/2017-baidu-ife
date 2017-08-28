@@ -9,16 +9,37 @@
 2.**采用ES6中的proxy，对目标对象进行"拦截"**。
 
 方式一：
-
+Object.defineProperty(obj, prop, descriptor)定义对象的属性。
 Object.defineProperty可设置的属性如下：
 
-**configurable**：能否使用delete、能否需改属性特性、能否修改访问器属性，false为不可重新定义，默认值为true。一般情况下，configurable是设置为true，如果设置为false，这个属性除了writable之外都不能修改了，writable也只能从true改为false而不能反过来。
+**configurable**：能否使用delete、能否修改属性特性、能否修改访问器属性，false为不可重新定义。
+//一般情况下，configurable是设置为true，如果设置为false，这个属性除了writable之外都不能修改了，writable也只能从true改为false而不能反过来。
 
-**enumerable**：对象属性是否可通过for-in循环，flase为不可循环，默认值为true。
+**enumerable**：对象属性是否可通过for-in循环遍历或在Object.keys中列举。
 
-**writable**：对象属性是否可修改,flase为不可修改，默认值为true。
+**writable**：对象属性是否可修改，false为不可修改。
 
 **value**：对象属性的默认值，默认值为undefined。
+
+
+注意： configurable， enumerable， writable特性默认值根据对象定义方法不同而不同。
+// 直接在对象上定义属性，这些特性默认值为true
+var obj = {};
+obj.name = 'season';
+console.log(Object.getOwnPropertyDescriptor(obj, 'name'));
+// Object {value: "season", writable: true, enumerable: true, configurable: true}
+
+// 调用Object.defineProperty()方法，不指定值的时候，默认为false
+var obj = {};
+obj.defineProperty(obj, 'name', {
+  value: 'season'
+});
+console.log(Object.getOwnPropertyDescriptor(obj, 'name'))
+// Object {value: "season", writable: false, enumerable: false, configurable: false}
+
+
+// 在本例中，可以定义configurable、enumerable，默认为false。 但是如果定义了set或get方法中的任何一个，就不能再设置writable，即使false也不可以。
+
 
 接着获取对象属性：
 
@@ -35,14 +56,16 @@ get函数return data[key]，导致get函数返回值时又触发了get函数，�
 
     function Observer(data) {
       this.data = data;
-      this.setAndget(data);
+      this.getset(data);
     }
-    Observer.prototype.makeObserver = function(data) {
+    Observer.prototype.getset = function(data) {
       for(var key in data) {
+        var val = data[key];
         if(data.hasOwnProperty(key)) {
           Object.defineProperty(data, key, {
             configurable: true,
-            enumerable: true,
+            enumerable: true, 
+            //writable: true, //这里不能定义此属性，报错：Uncaught TypeError: Invalid property descriptor. Cannot both specify accessors and a value or writable attribute, #<Object>
             get: function () {
               console.log('你访问了' + key);
               return val;

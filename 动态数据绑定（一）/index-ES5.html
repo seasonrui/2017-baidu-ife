@@ -8,12 +8,13 @@
 <script type="text/javascript">
 function Observer(data) {
   this.data = data;
-  this.setAndget(data);
+  this.getset(data);
 }
 
-Observer.prototype.makeObserver = function(data) {
+Observer.prototype.getset = function(data) {
   for(var key in data) {
     if(data.hasOwnProperty(key)) {
+      var val = data[key];
       Object.defineProperty(data, key, {
         configurable: true,
         enumerable: true,
